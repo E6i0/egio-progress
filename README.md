@@ -3,96 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EGIO PROGRESS | Life Architecture</title>
+    <title>EGIO PROGRESS | Sistema Operativo Personal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; color: #1f2937; }
-        .card { background: white; border-radius: 16px; padding: 1.5rem; shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .btn-status { transition: all 0.2s; filter: grayscale(1); opacity: 0.5; }
-        .btn-status.active { filter: grayscale(0); opacity: 1; transform: scale(1.2); }
+        .card { background: white; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .task-done { text-decoration: line-through; opacity: 0.5; }
+        .btn-status { transition: all 0.2s; filter: grayscale(1); font-size: 1.5rem; }
+        .btn-status.active { filter: grayscale(0); transform: scale(1.2); }
     </style>
 </head>
-<body class="max-w-4xl mx-auto p-4 pb-20">
+<body class="max-w-2xl mx-auto p-4 pb-24">
 
-    <header class="flex justify-between items-center my-6">
+    <header class="flex justify-between items-end my-6">
         <div>
-            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">EGIO <span class="text-blue-600">PROGRESS</span></h1>
-            <p id="current-date" class="text-sm text-slate-500 font-medium uppercase tracking-widest"></p>
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">EGIO <span class="text-blue-600">OS</span></h1>
+            <p id="current-date" class="text-xs text-slate-500 font-bold uppercase tracking-widest"></p>
         </div>
         <div class="text-right">
-            <div class="text-xs text-slate-400">LONGEVIDAD ACUMULADA</div>
-            <div class="text-2xl font-bold text-emerald-600">+<span id="years-gained">0</span> días</div>
+            <div class="text-[10px] font-bold text-slate-400 uppercase">Progreso del Día</div>
+            <div class="w-24 bg-gray-200 h-2 rounded-full mt-1">
+                <div id="day-progress-bar" class="bg-emerald-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+            </div>
         </div>
     </header>
 
-    <main class="grid gap-6">
-        
-        <section class="card border-l-8 border-blue-500">
-            <h2 class="text-lg font-bold mb-3 flex items-center">🏠 Micro-Zona: <span id="daily-zone" class="ml-2 text-blue-600"></span></h2>
-            <div id="tasks-container" class="space-y-3 text-sm">
-                </div>
-        </section>
-
-        <section class="card border-l-8 border-emerald-500">
-            <h2 class="text-lg font-bold mb-4 italic">📊 PeakWatch & Reseña</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1 uppercase">Estado de Ánimo</label>
-                    <div class="flex gap-4 text-3xl">
-                        <button onclick="setStatus('sad')" id="btn-sad" class="btn-status">😢</button>
-                        <button onclick="setStatus('neutral')" id="btn-neutral" class="btn-status">😐</button>
-                        <button onclick="setStatus('happy')" id="btn-happy" class="btn-status">😊</button>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1 uppercase">Nota del Día (Breve)</label>
-                    <input type="text" id="day-note" placeholder="¿Cómo fue tu enfoque hoy?" class="w-full border-b-2 border-slate-200 py-1 focus:border-emerald-500 outline-none transition-colors">
-                </div>
+    <section class="mb-6">
+        <h2 class="text-sm font-bold text-blue-600 uppercase mb-3 tracking-tighter">⚡ Foco Actual</h2>
+        <div id="current-focus-card" class="card border-l-4 border-blue-500">
             </div>
-            <button onclick="saveEntry()" class="w-full mt-6 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-all">FINALIZAR DÍA & GUARDAR</button>
-        </section>
+    </section>
 
-        <section class="mt-8">
-            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Historial de Evolución</h3>
-            <div id="history-container" class="space-y-3">
-                </div>
-        </section>
+    <section class="mb-6">
+        <h2 class="text-sm font-bold text-slate-500 uppercase mb-3 tracking-tighter italic">📝 Tareas Clave</h2>
+        <div id="tasks-list" class="space-y-2">
+            </div>
+    </section>
 
-    </main>
+    <section class="card border-t-4 border-slate-900">
+        <h3 class="text-sm font-bold mb-4 uppercase">Cierre de Jornada</h3>
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex gap-4">
+                <button onclick="setStatus('sad')" id="btn-sad" class="btn-status">😢</button>
+                <button onclick="setStatus('neutral')" id="btn-neutral" class="btn-status">😐</button>
+                <button onclick="setStatus('happy')" id="btn-happy" class="btn-status">😊</button>
+            </div>
+            <input type="text" id="day-note" placeholder="Reseña breve..." class="flex-1 ml-4 border-b border-slate-300 outline-none text-sm">
+        </div>
+        <button onclick="saveDay()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold text-sm">GUARDAR EN LOGS</button>
+    </section>
+
+    <section id="history" class="mt-8 space-y-2">
+        <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Historial de Cumplimiento</h3>
+        </section>
 
     <script>
-        const zones = {
-            1: { name: "Habitación (Orden Visual)", tasks: ["Organizar ropa", "Limpiar superficies", "Revisar outfit semanal"] },
-            2: { name: "Cocina (Fuego Limpio)", tasks: ["Limpiar estufa", "Revisar refri", "Ordenar despensa"] },
-            3: { name: "Baño (Sanitización)", tasks: ["Limpiar lavabo", "Espejo", "Desinfección rápida"] },
-            4: { name: "Área Común (Flujo)", tasks: ["Barrer/Trapear", "Ordenar mesa/escritorio"] },
-            5: { name: "Reset General", tasks: ["Vaciar basuras", "Gestionar ropa sucia", "Revisión visual"] },
-            6: { name: "Cocina + Meal Prep", tasks: ["Preparar alimentos semana", "Limpieza profunda"] },
-            0: { name: "Mente + Planificación", tasks: ["Revisar semana", "Checklist EGIO", "Cierre mental"] }
+        const schedule = [
+            { start: 6, end: 8, title: "🌅 Mañana: Higiene & Traslado", tasks: ["Tender cama", "Outfit listo", "Audio educativo/Reflexión"] },
+            { start: 8, end: 13, title: "🏢 Trabajo: Bloque BAMX", tasks: ["3 Tareas clave BAMX", "Contacto aliados", "Seguimiento acopio"] },
+            { start: 13, end: 18, title: "🏢 Trabajo: Logística", tasks: ["Planeación evento", "Documentación", "Cierre jornada"] },
+            { start: 18, end: 20, title: "🚗 Regreso & EGIO Bloque", tasks: ["Desconexión mental", "Micro-zona del día"] },
+            { start: 20, end: 24, title: "🌙 Cierre & Descanso", tasks: ["Higiene personal", "Revisión biométrica", "Plan día siguiente"] }
+        ];
+
+        const daySpecifics = {
+            1: "Lunes: Salud + Revisión Biométrica",
+            2: "Martes: Producción Contenido Digital",
+            3: "Miércoles: Higiene Profunda Personal",
+            4: "Jueves: Monetización / Programación",
+            5: "Viernes: Evaluación Semanal EGIO",
+            6: "Sábado: Batching Contenido (2hrs)",
+            0: "Domingo: Planificación Semanal"
         };
 
         let currentStatus = null;
-        let entries = JSON.parse(localStorage.getItem('egio_entries')) || [];
+        let logs = JSON.parse(localStorage.getItem('egio_logs')) || [];
 
         function init() {
             const now = new Date();
-            document.getElementById('current-date').innerText = now.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const hour = now.getHours();
+            const day = now.getDay();
             
-            const dayNum = now.getDay();
-            const zone = zones[dayNum];
-            document.getElementById('daily-zone').innerText = zone.name;
+            document.getElementById('current-date').innerText = now.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
+
+            // Cargar Foco Actual
+            const currentSlot = schedule.find(s => hour >= s.start && hour < s.end) || schedule[0];
+            const dayTheme = daySpecifics[day];
             
-            const container = document.getElementById('tasks-container');
-            container.innerHTML = zone.tasks.map(t => `
-                <label class="flex items-center p-2 hover:bg-slate-50 rounded-lg cursor-pointer">
-                    <input type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300">
-                    <span class="ml-3">${t}</span>
-                </label>
+            document.getElementById('current-focus-card').innerHTML = `
+                <p class="text-xs font-bold text-blue-400 uppercase tracking-wider">${currentSlot.title}</p>
+                <p class="font-bold text-lg">${dayTheme}</p>
+            `;
+
+            // Cargar Checkbox con las tareas del slot actual
+            const list = document.getElementById('tasks-list');
+            list.innerHTML = currentSlot.tasks.map((t, i) => `
+                <div class="flex items-center bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                    <input type="checkbox" onchange="updateProgress()" class="w-5 h-5 rounded-full border-2 border-blue-500 accent-blue-500">
+                    <span class="ml-3 text-sm font-medium text-slate-700">${t}</span>
+                </div>
             `).join('');
 
-            updateHistory();
-            calculateLongevity();
+            renderLogs();
+        }
+
+        function updateProgress() {
+            const checks = document.querySelectorAll('input[type="checkbox"]');
+            const done = Array.from(checks).filter(c => c.checked).length;
+            const percent = (done / checks.length) * 100;
+            document.getElementById('day-progress-bar').style.width = percent + '%';
         }
 
         function setStatus(s) {
@@ -101,56 +121,31 @@
             document.getElementById('btn-' + s).classList.add('active');
         }
 
-        function saveEntry() {
-            if(!currentStatus) return alert("Por favor, selecciona tu estado de ánimo.");
-            
-            const newEntry = {
+        function saveDay() {
+            if(!currentStatus) return alert("Selecciona una carita");
+            const entry = {
                 id: Date.now(),
-                date: new Date().toLocaleString(),
+                date: new Date().toLocaleString('es-MX', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'}),
                 status: currentStatus,
                 note: document.getElementById('day-note').value,
-                zone: document.getElementById('daily-zone').innerText
+                longevity: (Math.random() * (0.8 - 0.1) + 0.1).toFixed(2) // Simulación de ganancia
             };
-
-            entries.unshift(newEntry);
-            localStorage.setItem('egio_entries', JSON.stringify(entries));
-            
+            logs.unshift(entry);
+            localStorage.setItem('egio_logs', JSON.stringify(logs));
+            renderLogs();
             // Reset UI
-            document.getElementById('day-note').value = '';
-            currentStatus = null;
-            document.querySelectorAll('.btn-status').forEach(b => b.classList.remove('active'));
-            
-            updateHistory();
-            calculateLongevity();
+            document.getElementById('day-note').value = "";
+            setStatus(null);
         }
 
-        function deleteEntry(id) {
-            entries = entries.filter(e => e.id !== id);
-            localStorage.setItem('egio_entries', JSON.stringify(entries));
-            updateHistory();
-            calculateLongevity();
-        }
-
-        function updateHistory() {
-            const container = document.getElementById('history-container');
-            container.innerHTML = entries.map(e => `
-                <div class="card flex justify-between items-center shadow-sm py-3 px-4">
-                    <div class="flex items-center gap-4">
-                        <span class="text-2xl">${e.status === 'happy' ? '😊' : e.status === 'neutral' ? '😐' : '😢'}</span>
-                        <div>
-                            <p class="text-[10px] text-slate-400 uppercase font-bold">${e.date}</p>
-                            <p class="text-sm font-semibold text-slate-700">${e.note || 'Sin nota'}</p>
-                        </div>
-                    </div>
-                    <button onclick="deleteEntry(${e.id})" class="text-red-300 hover:text-red-500 text-xs">Borrar</button>
+        function renderLogs() {
+            document.getElementById('history').innerHTML = '<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Historial</h3>' + 
+            logs.map(l => `
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg text-xs shadow-sm">
+                    <span>${l.status === 'happy' ? '😊' : l.status === 'neutral' ? '😐' : '😢'} <b>${l.date}</b> - ${l.note}</span>
+                    <span class="text-emerald-600 font-bold">+${l.longevity}d</span>
                 </div>
             `).join('');
-        }
-
-        function calculateLongevity() {
-            // Lógica: Cada entrada guardada suma 0.5 días de "longevidad" por disciplina
-            const days = (entries.length * 0.5).toFixed(1);
-            document.getElementById('years-gained').innerText = days;
         }
 
         init();
