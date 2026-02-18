@@ -1,158 +1,126 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>EGIO Progress</title>
+let mood = null;
+let currentDateKey = "";
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background:#0f172a;
-  color:white;
-  margin:0;
-  padding:20px;
+function getDateKey(dateObj) {
+    return "egio_data_" + dateObj.toISOString().split('T')[0];
 }
 
-h1 {text-align:center;}
+function loadDayData() {
+    const picker = document.getElementById("date-picker");
+    const selectedDate = new Date(picker.value);
+    currentDateKey = getDateKey(selectedDate);
 
-.section {
-  background:#1e293b;
-  padding:15px;
-  margin:10px 0;
-  border-radius:12px;
+    const saved = JSON.parse(localStorage.getItem(currentDateKey)) || {
+        checks: {},
+        mood: null,
+        note: ""
+    };
+
+    mood = saved.mood;
+    document.getElementById("daily-note").value = saved.note || "";
+
+    document.querySelectorAll('input[type="checkbox"]').forEach(c => {
+        c.checked = saved.checks[c.id] || false;
+    });
+
+    highlightMood();
+    updateStats();
 }
 
-.task {
-  margin:6px 0;
+function saveDayData() {
+    const checks = {};
+    document.querySelectorAll('input[type="checkbox"]').forEach(c => {
+        checks[c.id] = c.checked;
+    });
+
+    const data = {
+        checks,
+        mood,
+        note: document.getElementById("daily-note").value
+    };
+
+    localStorage.setItem(currentDateKey, JSON.stringify(data));
 }
 
-progress {
-  width:100%;
-  height:20px;
+function highlightMood() {
+    document.querySelectorAll('button[id^="m-"]').forEach(b => b.classList.add('grayscale'));
+    if (!mood) return;
+
+    const map = { happy: "hap", sad: "sad", neutral: "neu" };
+    document.getElementById("m-" + map[mood]).classList.remove('grayscale');
 }
 
-button {
-  padding:8px;
-  border:none;
-  border-radius:8px;
-  background:#38bdf8;
-  cursor:pointer;
-}
-</style>
-</head>
-
-<body>
-
-<h1>⚡ EGIO PROGRESS</h1>
-
-<div class="section">
-<h2>🧠 Salud + Higiene</h2>
-<div id="salud"></div>
-</div>
-
-<div class="section">
-<h2>🏠 Hogar del Día</h2>
-<div id="hogar"></div>
-</div>
-
-<div class="section">
-<h2>💻 Digital Money</h2>
-<div id="digital"></div>
-</div>
-
-<div class="section">
-<h2>🤝 BAMX Trabajo</h2>
-<div id="bamx"></div>
-</div>
-
-<div class="section">
-<h2>📊 Progreso Diario</h2>
-<progress id="barra" value="0" max="100"></progress>
-</div>
-
-<script>
-
-const tareas = {
-
-salud: [
-"Beber agua",
-"Higiene personal completa",
-"Movilidad ligera",
-"Registrar datos smartwatch"
-],
-
-digital: [
-"Revisar calendario contenido",
-"Editar/publicar",
-"Optimizar ideas"
-],
-
-bamx: [
-"Contacto aliado",
-"Seguimiento acopio",
-"Planeación logística"
-]
-
-};
-
-const hogarPorDia = {
-0: ["Planificar semana", "Orden general"],
-1: ["Organizar habitación"],
-2: ["Limpiar cocina"],
-3: ["Baño rápido"],
-4: ["Área común"],
-5: ["Reset general"],
-6: ["Meal prep + orden"]
-};
-
-function crearChecklist(lista, contenedor, clave) {
-
-lista.forEach((t, i) => {
-
-let id = clave + i;
-
-let div = document.createElement("div");
-div.className = "task";
-
-let chk = document.createElement("input");
-chk.type = "checkbox";
-chk.checked = localStorage.getItem(id) === "true";
-
-chk.onchange = () => {
-localStorage.setItem(id, chk.checked);
-actualizarBarra();
-};
-
-div.appendChild(chk);
-div.append(" " + t);
-
-contenedor.appendChild(div);
-
-});
-
+function setMood(m) {
+    mood = m;
+    highlightMood();
+    saveDayData();
 }
 
-function actualizarBarra() {
-
-let checks = document.querySelectorAll("input[type=checkbox]");
-let total = checks.length;
-let activos = [...checks].filter(c => c.checked).length;
-
-let progreso = Math.round((activos/total)*100);
-document.getElementById("barra").value = progreso;
-
+function saveCheck(id) {
+    saveDayData();
+    updateStats();
 }
 
-crearChecklist(tareas.salud, document.getElementById("salud"), "s");
-crearChecklist(tareas.digital, document.getElementById("digital"), "d");
-crearChecklist(tareas.bamx, document.getElementById("bamx"), "b");
+function updateStats() {
+    const checks = document.querySelectorAll('input[type="checkbox"]');
+    const done = Array.from(checks).filter(c => c.checked).length;
+    const percent = checks.length ? Math.round((done / checks.length) * 100) : 0;
 
-let dia = new Date().getDay();
-crearChecklist(hogarPorDia[dia], document.getElementById("hogar"), "h");
+    document.getElementById('clarity-percent').innerText = percent + '%';
+    document.getElementById('longevity-score').innerText = (done * 0.05).toFixed(1);
+}
 
-actualizarBarra();
+function initDatePicker() {
+    const picker = document.getElementById("date-picker");
+    const today = new Date().toISOString().split('T')[0];
+    picker.value = today;
 
-</script>
+    picker.addEventListener("change", loadDayData);
+}
 
-</body>
-</html>
+function initApp() {
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+
+    document.getElementById('header-date').innerText =
+        now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' });
+
+    OS_PLAN[3].tasks = DAILY_ZONES[day].tasks;
+    OS_PLAN[3].title = `🏠 Micro-Zona: ${DAILY_ZONES[day].name}`;
+
+    const container = document.getElementById('app-engine');
+
+    container.innerHTML = OS_PLAN.map(block => {
+        const startHour = parseInt(block.time.split(':')[0]);
+        const isCurrent = hour >= startHour && hour < (startHour + 4);
+
+        return `
+        <div class="glass-card p-5 ${isCurrent ? 'current-block ring-1 ring-sky-500/30' : 'opacity-50'}">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h3 class="text-[10px] font-bold text-sky-400 uppercase tracking-tighter">${block.time}</h3>
+                    <p class="font-bold text-md">${block.title}</p>
+                </div>
+            </div>
+            <div class="space-y-2">
+                ${block.tasks.map(task => {
+                    const id = btoa(task).substring(0,10);
+                    return `
+                    <div class="flex items-center">
+                        <input type="checkbox" id="${id}" onchange="saveCheck('${id}')"
+                        class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0">
+                        <label for="${id}" class="ml-3 text-xs font-medium text-slate-300">${task}</label>
+                    </div>`;
+                }).join('')}
+            </div>
+        </div>`;
+    }).join('');
+
+    initDatePicker();
+    loadDayData();
+}
+
+document.getElementById("daily-note").addEventListener("input", saveDayData);
+
+initApp();
