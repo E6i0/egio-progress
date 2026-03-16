@@ -7,39 +7,44 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@200;400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --emerald: #10b981; --bg: #050505; --card: #0f0f0f; }
+        :root { --emerald: #10b981; --bg: #050505; }
+        
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: var(--bg); 
             color: #e2e8f0; 
             background-image: radial-gradient(circle at 2px 2px, #1a1a1a 1px, transparent 0);
             background-size: 32px 32px;
-            padding-bottom: 220px; /* Espacio para que el scroll supere al footer */
+            /* SOLUCIÓN AL SÁBADO: Espacio extra para permitir scroll completo */
+            padding-bottom: 250px; 
         }
+
         .mono { font-family: 'JetBrains Mono', monospace; }
         .glass { background: rgba(15, 15, 15, 0.85); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(12px); }
-        .active-day { border: 2px solid var(--emerald); box-shadow: 0 0 25px rgba(16, 185, 129, 0.2); }
+        .active-day { border: 2px solid var(--emerald); box-shadow: 0 0 25px rgba(16, 185, 129, 0.15); }
         
-        /* FOOTER INTELIGENTE: Se esconde automáticamente */
+        /* BARRA INFERIOR INTELIGENTE: Se esconde para no estorbar */
         .smart-footer {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             z-index: 100;
-            transform: translateY(75%); /* Escondido */
-            opacity: 0.4;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(70%); /* Escondida */
+            opacity: 0.3;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 1.5rem;
-            background: linear-gradient(to top, black 70%, transparent);
+            background: linear-gradient(to top, black 80%, transparent);
         }
+
         .smart-footer:hover {
-            transform: translateY(0); /* Aparece al acercar el mouse */
+            transform: translateY(0); /* Aparece al pasar el mouse */
             opacity: 1;
         }
 
         input[type="checkbox"] { width: 1.2rem; height: 1.2rem; accent-color: var(--emerald); cursor: pointer; }
         input[type="checkbox"]:checked + label { color: #475569; text-decoration: line-through; }
+        
         .achievement-slot { width: 12px; height: 12px; border-radius: 2px; background: #1a1a1a; transition: all 0.5s; }
         .achievement-slot.filled { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
     </style>
@@ -65,7 +70,7 @@
             <div id="ritual-tasks" class="space-y-4"></div>
         </section>
         <section class="glass p-8 border-l-4 border-emerald-500">
-            <h3 class="text-[10px] font-bold tracking-widest text-emerald-500 mono mb-6 uppercase">🏠 Micro-Zona: <span id="current-zone-name"></span></h3>
+            <h3 class="text-[10px] font-bold tracking-widest text-emerald-500 mono mb-6 uppercase">🏠 Micro-Zona Hoy: <span id="current-zone-name"></span></h3>
             <div id="micro-tasks" class="space-y-4"></div>
         </section>
         <section class="glass p-8">
@@ -81,7 +86,7 @@
     <footer class="smart-footer">
         <div class="max-w-6xl mx-auto glass p-6 shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6 border-t border-emerald-500/20">
             <div>
-                <p class="text-[9px] text-slate-500 uppercase font-bold mono mb-2">Consistencia (30D)</p>
+                <p class="text-[9px] text-slate-500 uppercase font-bold mono mb-2">Consistencia de Hábitos (30D)</p>
                 <div id="achievement-grid" class="flex flex-wrap gap-1"></div>
             </div>
             <div class="flex gap-4">
@@ -122,11 +127,10 @@
                     <div class="space-y-4">
                         ${item.t.map((task, i) => {
                             const uid = `weekly-${item.id}-${i}`;
-                            return `
-                                <div class="flex items-center gap-3 group">
-                                    <input type="checkbox" id="${uid}" onchange="toggle('${uid}')" ${state.checks[uid] ? 'checked' : ''}>
-                                    <label for="${uid}" class="text-xs font-medium text-slate-400 group-hover:text-white cursor-pointer">${task}</label>
-                                </div>`;
+                            return `<div class="flex items-center gap-3 group">
+                                <input type="checkbox" id="${uid}" onchange="toggle('${uid}')" ${state.checks[uid] ? 'checked' : ''}>
+                                <label for="${uid}" class="text-xs font-medium text-slate-400 group-hover:text-white cursor-pointer">${task}</label>
+                            </div>`;
                         }).join('')}
                     </div>
                 </div>
@@ -152,28 +156,34 @@
         }
 
         function toggle(uid) { state.checks[uid] = document.getElementById(uid).checked; save(); calculate(); }
+        
         function calculate() { 
             const total = Object.values(state.checks).filter(v => v).length;
             document.getElementById('total-longevity').innerText = (total * 0.012).toFixed(3);
         }
+
         function renderAchievements() {
             const container = document.getElementById('achievement-grid');
             container.innerHTML = Array.from({length: 30}).map((_, i) => `<div class="achievement-slot ${i < state.history ? 'filled' : ''}"></div>`).join('');
         }
+
         function executeCut() {
             const todayStr = new Date().toISOString().split('T')[0];
-            if(state.lastCut === todayStr) return alert("Corte ya realizado.");
+            if(state.lastCut === todayStr) return alert("Corte ya realizado hoy.");
             state.history++; state.lastCut = todayStr; save(); renderAchievements();
-            alert("SISTEMA SINCRONIZADO.");
+            alert("PROTOCOLO COMPLETADO.");
         }
+
         function exportHistory() {
-            const data = `EGIO LOG\nLongevidad: ${document.getElementById('total-longevity').innerText}\n\n` + Object.entries(state.checks).filter(([k,v]) => v).map(([k,v]) => `[OK] ${k}`).join('\n');
+            const data = `EGIO OS LOG\nLongevidad: ${document.getElementById('total-longevity').innerText}\n\n` + 
+                Object.entries(state.checks).filter(([k,v]) => v).map(([k,v]) => `[✓] ${k}`).join('\n');
             const blob = new Blob([data], {type: 'text/plain'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = `EGIO_Backup.txt`;
             a.click();
         }
+
         function save() { localStorage.setItem('egio_v8_state', JSON.stringify(state)); }
         init();
     </script>
