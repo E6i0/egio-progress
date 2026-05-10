@@ -3,163 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROGRESS | Tactical Dashboard</title>
+    <title>PROGRESS | Tactical Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'JetBrains Mono', monospace; background-color: #0a0a0a; color: #e5e5e5; }
-        .card { background-color: #141414; border: 1px solid #262626; border-radius: 16px; }
-        .task-done { border-color: #3b82f6; background-color: #1e293b; opacity: 0.6; text-decoration: line-through; }
-        .progress-fill { transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-        .day-box { width: 12px; height: 12px; border-radius: 2px; background-color: #262626; }
-        .day-active { background-color: #3b82f6; box-shadow: 0 0 8px #3b82f6; }
+        body { font-family: 'JetBrains Mono', monospace; background-color: #050505; color: #e0e0e0; }
+        .card { background: #0f0f0f; border: 1px solid #1f1f1f; border-radius: 12px; }
+        .task-done { border-color: #22c55e !important; opacity: 0.5; text-decoration: line-through; }
+        .btn-action { background: #1a1a1a; border: 1px solid #333; transition: all 0.2s; }
+        .btn-action:active { transform: scale(0.95); background: #333; }
     </style>
 </head>
-<body class="max-w-md mx-auto p-6 pb-24">
+<body class="max-w-md mx-auto p-4 pb-20">
 
-    <header class="mb-8">
-        <div class="flex justify-between items-center mb-2">
-            <h1 class="text-2xl font-extrabold tracking-tighter italic text-white">PROGRESS</h1>
-            <span id="current-day-label" class="text-[10px] bg-blue-600 text-white px-2 py-1 rounded">MODO: ESTÁNDAR</span>
+    <header class="mb-6">
+        <div class="flex justify-between items-end mb-2">
+            <h1 class="text-xl font-bold tracking-tighter italic">PROGRESS v2.2</h1>
+            <span id="rank-label" class="text-[9px] font-bold text-green-500">MANTENIMIENTO</span>
         </div>
-        <div class="w-full bg-zinc-900 h-1 rounded-full overflow-hidden">
-            <div id="year-progress" class="bg-zinc-500 h-full w-0 progress-fill"></div>
+        <div class="w-full bg-zinc-900 h-1.5 rounded-full">
+            <div id="year-bar" class="bg-blue-600 h-full w-0 transition-all duration-1000"></div>
         </div>
-        <div class="flex justify-between mt-1">
-            <p class="text-[8px] text-zinc-500 uppercase">Progreso Año 2026</p>
-            <p id="days-left" class="text-[8px] text-zinc-500 uppercase">-- días restantes</p>
-        </div>
+        <p class="text-[8px] text-zinc-600 mt-1 uppercase tracking-widest text-right" id="days-left-text"></p>
     </header>
 
-    <section class="card p-4 mb-6">
-        <p class="text-[9px] text-zinc-500 uppercase mb-3">Rendimiento Semanal</p>
-        <div class="flex justify-between px-2" id="week-calendar">
-            <div class="flex flex-col items-center gap-1"><div class="day-box" id="d0"></div><span class="text-[7px]">L</span></div>
-            <div class="flex flex-col items-center gap-1"><div class="day-box" id="d1"></div><span class="text-[7px]">M</span></div>
-            <div class="flex flex-col items-center gap-1"><div class="day-box" id="d2"></div><span class="text-[7px]">M</span></div>
-            <div class="flex flex-col items-center gap-1"><div class="day-box" id="d3"></div><span class="text-[7px]">J</span></div>
-            <div class="flex flex-col items-center gap-1"><div class="day-box" id="d4"></div><span class="text-[7px]">V</span></div>
-            <div class="flex flex-col items-center gap-1"><div class="day-box" id="d5"></div><span class="text-[7px]">S</span></div>
-            <div class="flex flex-col items-center gap-1"><div class="day-box" id="d6"></div><span class="text-[7px]">D</span></div>
+    <div class="card p-5 mb-6 flex justify-between items-center border-l-4 border-l-green-600">
+        <div>
+            <p class="text-[10px] text-zinc-500 uppercase">Puntos Hoy</p>
+            <h2 id="main-score" class="text-5xl font-bold italic">0</h2>
         </div>
-    </section>
-
-    <section class="card p-6 mb-8 border-l-4 border-l-blue-600">
-        <div class="flex justify-between items-end">
-            <div>
-                <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Puntos Hoy</p>
-                <h2 id="score" class="text-6xl font-black text-white">0</h2>
-            </div>
-            <div class="text-right">
-                <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Status</p>
-                <p id="rank" class="text-xs font-bold text-blue-400">MANTENIMIENTO</p>
-            </div>
+        <div class="flex gap-2">
+            <button onclick="saveToJSON()" class="btn-action p-3 rounded-lg text-[10px]">💾 GUARDAR</button>
+            <button onclick="resetDay()" class="btn-action p-3 rounded-lg text-[10px] text-red-400">🔄 RESET</button>
         </div>
-    </section>
+    </div>
 
-    <main id="tasks-container" class="space-y-4">
+    <main id="tasks-root" class="space-y-6">
         </main>
-
-    <button onclick="alert('🪙 Sobriedad Confirmada')" class="fixed bottom-6 right-6 bg-white text-black w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition">
-        <span class="text-xl font-bold">+1</span>
-    </button>
 
     <script>
         const DATE = new Date();
-        const WEEKDAY = DATE.getDay(); // 0=D, 1=L... 6=S
+        const WEEKDAY = DATE.getDay(); // 0=Dom, 1=Lun...
 
-        const MISSION_DATA = {
-            standard: [ // Lunes a Viernes
-                { name: "Deep Work (10 min)", pts: 15, area: "Mental" },
-                { name: "Intención MIT", pts: 15, area: "Mental" },
-                { name: "Aliados (3 contactos)", pts: 20, area: "Trabajo" },
-                { name: "Hidratación (1L)", pts: 10, area: "Salud" },
-                { name: "Orden 10 min", pts: 10, area: "Salud" }
+        // 1. DEFINICIÓN DE ACTIVIDADES (Categorías 1, 2 y 3)
+        const MASTER_TASKS = {
+            blocks: [ // Cat 1: Puntos Base
+                { name: "5:00AM: Hidratación + Estiramiento", pts: 10, time: "AM" },
+                { name: "Entrenamiento (Abdomen/Fuerza)", pts: 15, time: "AM" },
+                { name: "7:30AM: Salida Z150 (Lento/Prevenido)", pts: 10, time: "AM" },
+                { name: "Regreso Consciente (Seguridad)", pts: 10, time: "PM" },
+                { name: "Cierre: Orden Micro-zona (10 min)", pts: 15, time: "NOCHE" },
+                { name: "Desconexión Pantallas (30 min antes)", pts: 15, time: "NOCHE" }
             ],
-            saturday: [ // SÁBADO: MANTENIMIENTO Z150
-                { name: "Aseo Profundo Casa", pts: 30, area: "Orden" },
-                { name: "Lavado Detallado Z150", pts: 20, area: "Moto" },
-                { name: "Revisión Cadena/Aceite Z150", pts: 20, area: "Moto" },
-                { name: "Cambio de Sábanas", pts: 10, area: "Orden" },
-                { name: "Cita con Serrat (Foco Total)", pts: 40, area: "Pareja" }
-            ],
-            sunday: [ // DOMINGO: ESTRATEGIA
-                { name: "Planificación Semanal PROGRESS", pts: 40, area: "Estrategia" },
-                { name: "Carga Nula (Inbox 0)", pts: 20, area: "Mental" },
-                { name: "Lectura / Skill-up", pts: 30, area: "Mental" },
-                { name: "Prep Comidas Semanal", pts: 30, area: "Salud" },
-                { name: "Cierre Financiero Semanal", pts: 30, area: "Finanzas" }
-            ]
+            football: { // Cat 2: Proyecto Digital (Días clave Martes/Mier)
+                1: "Scouting y Guiones Fútbol",
+                2: "EDICIÓN INTENSIVA: Clip 1",
+                3: "EDICIÓN INTENSIVA: Clip 2",
+                4: "SEO y Portadas Shorts",
+                5: "Programación Post-Producción",
+                6: "Break Creativo (Enfoque Moto)",
+                0: "UPLOAD: Lanzamiento Semanal"
+            },
+            ejes: { // Cat 3: Rumbo a los 30
+                1: "Eje Físico: Técnica de Carrera",
+                2: "Eje Relacional: Feedback Mariel/Serrat",
+                3: "Eje Técnico: Automatización/Python",
+                4: "Eje Financiero: Corte de Tarjetas/Inversión",
+                5: "Eje Mental: Lectura de Largo Plazo",
+                6: "Eje Mecánico: Mantto. Profundo Z150",
+                0: "Eje Estratégico: Planeación Maestro"
+            }
         };
 
-        let currentScore = 0;
+        let currentData = JSON.parse(localStorage.getItem('progress_data')) || {
+            score: 0,
+            completed: [],
+            lastUpdate: new Date().toLocaleDateString()
+        };
 
         function init() {
-            updateTimeMetrics();
-            loadDailyPillar();
-            highlightCurrentDay();
+            // Si es un día nuevo, resetear automáticamente
+            if (currentData.lastUpdate !== new Date().toLocaleDateString()) resetDay();
+            
+            renderTasks();
+            updateStats();
         }
 
-        function updateTimeMetrics() {
+        function renderTasks() {
+            const root = document.getElementById('tasks-root');
+            root.innerHTML = "";
+
+            // Renderizar Bloques (Mañana, Tarde, Noche)
+            const blocks = ["AM", "PM", "NOCHE"];
+            blocks.forEach(b => {
+                const section = document.createElement('div');
+                section.innerHTML = `<h3 class="text-[10px] text-zinc-600 mb-2 uppercase tracking-widest">${b}</h3>`;
+                const tasks = MASTER_TASKS.blocks.filter(t => t.time === b);
+                tasks.forEach(t => section.appendChild(createTaskCard(t.name, t.pts)));
+                root.appendChild(section);
+            });
+
+            // Renderizar Ejes del Día (Fútbol y 30 años)
+            const specialSection = document.createElement('div');
+            specialSection.innerHTML = `<h3 class="text-[10px] text-blue-500 mb-2 uppercase tracking-widest font-bold">PROYECTOS & EJES</h3>`;
+            specialSection.appendChild(createTaskCard(MASTER_TASKS.football[WEEKDAY], 30));
+            specialSection.appendChild(createTaskCard(MASTER_TASKS.ejes[WEEKDAY], 20));
+            root.appendChild(specialSection);
+        }
+
+        function createTaskCard(name, pts) {
+            const card = document.createElement('div');
+            card.className = `card p-4 mb-2 flex justify-between items-center cursor-pointer ${currentData.completed.includes(name) ? 'task-done' : ''}`;
+            card.innerHTML = `<span class="text-xs">${name}</span><span class="text-[9px] font-bold">+${pts}</span>`;
+            card.onclick = () => toggleTask(card, name, pts);
+            return card;
+        }
+
+        function toggleTask(el, name, pts) {
+            if (currentData.completed.includes(name)) return;
+            
+            el.classList.add('task-done');
+            currentData.completed.push(name);
+            currentData.score += pts;
+            updateStats();
+            autoSave();
+        }
+
+        function updateStats() {
+            document.getElementById('main-score').innerText = currentData.score;
+            
+            // Year Progress
             const now = new Date();
             const start = new Date(now.getFullYear(), 0, 0);
             const diff = now - start;
-            const oneDay = 1000 * 60 * 60 * 24;
-            const dayOfYear = Math.floor(diff / oneDay);
-            const percentYear = (dayOfYear / 365) * 100;
-            
-            document.getElementById('year-progress').style.width = percentYear + "%";
-            document.getElementById('days-left').innerText = (365 - dayOfYear) + " DÍAS RESTANTES";
+            const day = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById('year-bar').style.width = (day/365*100) + "%";
+            document.getElementById('days-left-text').innerText = `${365 - day} DÍAS PARA TUS 30`;
+
+            const rank = document.getElementById('rank-label');
+            if(currentScore >= 120) rank.innerText = "HOMBRE ÉPICO";
         }
 
-        function highlightCurrentDay() {
-            // Ajustar JS (0=Dom) a tu visual (L=0, D=6)
-            let visualDay = WEEKDAY === 0 ? 6 : WEEKDAY - 1;
-            document.getElementById('d' + visualDay).classList.add('day-active');
+        function autoSave() {
+            localStorage.setItem('progress_data', JSON.stringify(currentData));
         }
 
-        function loadDailyPillar() {
-            const container = document.getElementById('tasks-container');
-            const label = document.getElementById('current-day-label');
-            let activeTasks = MISSION_DATA.standard;
-
-            if (WEEKDAY === 6) {
-                activeTasks = MISSION_DATA.saturday;
-                label.innerText = "MODO: MANTENIMIENTO & Z150";
-                label.classList.replace('bg-blue-600', 'bg-orange-600');
-            } else if (WEEKDAY === 0) {
-                activeTasks = MISSION_DATA.sunday;
-                label.innerText = "MODO: ESTRATEGIA & RESET";
-                label.classList.replace('bg-blue-600', 'bg-purple-600');
-            }
-
-            activeTasks.forEach(task => {
-                const div = document.createElement('div');
-                div.className = "card p-5 flex justify-between items-center cursor-pointer transition active:scale-95";
-                div.innerHTML = `
-                    <div>
-                        <p class="text-[8px] text-zinc-500 uppercase tracking-widest font-bold">${task.area}</p>
-                        <p class="text-sm font-medium text-white">${task.name}</p>
-                    </div>
-                    <span class="text-xs font-black text-zinc-600">+${task.pts}</span>
-                `;
-                div.onclick = () => {
-                    if(!div.classList.contains('task-done')) {
-                        div.classList.add('task-done');
-                        currentScore += task.pts;
-                        updateScore();
-                    }
-                };
-                container.appendChild(div);
-            });
+        function saveToJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentData));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "progress_backup_" + currentData.lastUpdate + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
         }
 
-        function updateScore() {
-            document.getElementById('score').innerText = currentScore;
-            const rank = document.getElementById('rank');
-            if (currentScore >= 120) rank.innerText = "HOMBRE ÉPICO";
-            else if (currentScore >= 70) rank.innerText = "EN PROGRESO";
-            else rank.innerText = "MANTENIMIENTO";
+        function resetDay() {
+            currentData = { score: 0, completed: [], lastUpdate: new Date().toLocaleDateString() };
+            autoSave();
+            location.reload();
         }
 
         init();
