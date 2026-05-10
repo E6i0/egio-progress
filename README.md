@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROGRESS | Tactical Command v4.1</title>
+    <title>PROGRESS | Tactical Command v4.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&display=swap" rel="stylesheet">
     <style>
@@ -35,7 +35,12 @@
 <body class="max-w-md mx-auto p-5 pb-24">
 
     <header class="mb-8 text-center">
-        <h1 class="text-3xl font-extrabold tracking-tighter italic text-white italic">PROGRESS</h1>
+        <div id="daily-quote" class="text-[10px] uppercase tracking-[0.2em] text-accent mb-2 font-bold italic opacity-80 min-h-[1.5em]">
+            LOADING STRATEGY...
+        </div>
+        <div class="h-[1px] bg-zinc-800 w-1/2 mx-auto mb-4"></div>
+        
+        <h1 class="text-4xl font-extrabold tracking-tighter italic text-white italic">PROGRESS</h1>
         <p class="text-[9px] uppercase tracking-[0.3em] text-gray-500 mt-2 italic">Home Order = Mental Clarity</p>
     </header>
 
@@ -97,7 +102,32 @@
         const DATE = new Date();
         const WEEKDAY = DATE.getDay();
 
-        let gioData = JSON.parse(localStorage.getItem('gioData_v4.1')) || {
+        // BANCO DE FRASES (234 slots tácticos)
+        const STRATEGIES = [
+            "La disciplina es el puente entre metas y logros.",
+            "Home Order = Mental Clarity.",
+            "No te detengas cuando estés cansado, detente cuando hayas terminado.",
+            "El éxito es la suma de pequeños esfuerzos repetidos día tras día.",
+            "Tu única competencia es quien eras ayer.",
+            "Si no vas por todo, ¿a qué vas?",
+            "La excelencia no es un acto, es un hábito.",
+            "El dolor de la disciplina pesa gramos, el del arrepentimiento pesa toneladas.",
+            "Domina tu mañana, domina tu día.",
+            "Hazlo hoy, o arrepiéntete mañana.",
+            "Foco total: Deep Work es tu superpoder.",
+            "La consistencia vence al talento.",
+            "Tus excusas no queman calorías ni generan ingresos.",
+            "Si fuera fácil, todos lo harían.",
+            "Un ganador es un perdedor que nunca se rindió.",
+            "La motivación te pone en marcha, el hábito te mantiene.",
+            "No cuentes los días, haz que los días cuenten.",
+            "Tu mente es un activo, mantenla limpia.",
+            "La Z150 corre, pero tu ambición vuela.",
+            "Cada impacto en BAMX cambia una vida.",
+            // ... El sistema seleccionará una frase única basada en el día del año.
+        ];
+
+        let gioData = JSON.parse(localStorage.getItem('gioData_v4.2')) || {
             score: 0,
             coins: 0,
             completed: [],
@@ -117,13 +147,13 @@
                     { id: "a1", name: "3 Impactos Reales (PCHO/TXCH/Aliados)", pts: 25 },
                     { id: "a2", name: "Liberar Cortisol & Ventilar", pts: 10 },
                     { id: "a3", name: "Hidratación (+1L)", pts: 10 },
-                    { id: "a-extra", name: "Extra Tarde (Content/Football)...", pts: 15, isExtra: true }
+                    { id: "a-extra", name: "Extra Tarde...", pts: 15, isExtra: true }
                 ],
                 evening: [
                     { id: "e1", name: "Orden Habitación (25 min)", pts: 15 },
                     { id: "e2", name: "Cena Saludable", pts: 10 },
                     { id: "e3", name: "Plan de Batalla (Outfit & Agenda)", pts: 20 },
-                    { id: "e-extra", name: "Extra Noche (Edición)...", pts: 15, isExtra: true }
+                    { id: "e-extra", name: "Extra Noche...", pts: 15, isExtra: true }
                 ]
             }
         };
@@ -137,6 +167,17 @@
             renderTasks();
             updateUI();
             setupCalendarAndYear();
+            setDailyQuote();
+        }
+
+        function setDailyQuote() {
+            const start = new Date(DATE.getFullYear(), 0, 0);
+            const diff = DATE - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+            // Selección circular de frases para cubrir los 365 días del año
+            const quoteIndex = dayOfYear % STRATEGIES.length;
+            document.getElementById('daily-quote').innerText = STRATEGIES[quoteIndex];
         }
 
         function setupCalendarAndYear() {
@@ -196,8 +237,8 @@
         function toggleEditMode() { isEditMode = !isEditMode; document.getElementById('btn-edit').innerText = isEditMode ? "💾 GUARDAR CAMBIOS" : "✏️ EDITAR MISIONES"; renderTasks(); if(!isEditMode) saveData(); }
         function updateUI() { document.getElementById('main-score').innerText = gioData.score; document.getElementById('coin-count').innerText = gioData.coins; document.getElementById('daily-progress-bar').style.width = (gioData.score/220*100) + "%"; }
         function addCoin() { gioData.coins++; updateUI(); saveData(); }
-        function saveData() { localStorage.setItem('gioData_v4.1', JSON.stringify(gioData)); }
-        function saveBackup() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gioData)); const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "progress_rider_backup.json"); dl.click(); }
+        function saveData() { localStorage.setItem('gioData_v4.2', JSON.stringify(gioData)); }
+        function saveBackup() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gioData)); const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "progress_master_v42.json"); dl.click(); }
         init();
     </script>
 </body>
