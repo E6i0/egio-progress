@@ -26,21 +26,19 @@
         .btn { background-color: var(--bg-card); border: 1px solid var(--border); transition: all 0.2s; font-size: 10px; font-weight: 700; }
         .btn-gold { border-color: var(--accent); color: var(--accent); }
         
-        /* Calendario */
         .day-box { width: 10px; height: 10px; border-radius: 2px; background-color: #1a1d21; border: 1px solid #2a2d31; }
         .day-past { background-color: #2a2d31; }
         .day-active { background-color: var(--accent); box-shadow: 0 0 8px var(--accent); }
 
-        /* Estilo para el Input Extra */
-        .extra-input { border-bottom: 1px solid var(--border) !important; padding: 4px 0; font-style: italic; }
+        .extra-input { border-bottom: 1px solid var(--border) !important; padding: 2px 0; font-style: italic; font-size: 12px; }
         .extra-input:focus { border-bottom-color: var(--accent) !important; }
     </style>
 </head>
 <body class="max-w-md mx-auto p-5 pb-24">
 
     <header class="mb-8 text-center">
-        <h1 class="text-3xl font-extrabold tracking-tighter italic text-white">PROGRESS</h1>
-        <p class="text-[9px] uppercase tracking-[0.3em] text-gray-500 mt-2">Home Order = Mental Clarity</p>
+        <h1 class="text-3xl font-extrabold tracking-tighter italic text-white italic">PROGRESS</h1>
+        <p class="text-[9px] uppercase tracking-[0.3em] text-gray-500 mt-2 italic">Home Order = Mental Clarity</p>
     </header>
 
     <section class="card p-4 mb-4">
@@ -64,8 +62,8 @@
             <div>
                 <p class="text-[10px] text-muted uppercase tracking-widest">Score Diario</p>
                 <div class="flex items-end gap-2">
-                    <h2 id="main-score" class="text-6xl font-extrabold text-white">0</h2>
-                    <span class="text-xs font-bold text-muted pb-1">/ 170 pts</span>
+                    <h2 id="main-score" class="text-6xl font-extrabold text-white leading-none">0</h2>
+                    <span class="text-xs font-bold text-muted pb-1">/ 200 pts</span>
                 </div>
             </div>
             <div class="text-right">
@@ -75,17 +73,17 @@
                 </div>
             </div>
         </div>
-        <div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+        <div class="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
             <div id="progress-bar" class="progress-fill h-full w-0"></div>
         </div>
     </section>
 
     <section class="flex gap-2 mb-8">
-        <button onclick="toggleEditMode()" id="btn-edit" class="btn w-1/2 p-3 rounded-lg">✏️ EDITAR TAREAS</button>
+        <button onclick="toggleEditMode()" id="btn-edit" class="btn w-1/2 p-3 rounded-lg">✏️ EDITAR ESTRUCTURA</button>
         <button onclick="saveBackup()" class="btn w-1/2 p-3 rounded-lg">💾 RESPALDO JSON</button>
     </section>
 
-    <main id="tasks-root" class="space-y-6"></main>
+    <main id="tasks-root" class="space-y-8"></main>
 
     <button onclick="addCoin()" class="fixed bottom-6 right-6 btn-gold btn w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition">
         <span class="text-2xl">🪙</span>
@@ -95,30 +93,31 @@
         const DATE = new Date();
         const WEEKDAY = DATE.getDay();
 
-        let gioData = JSON.parse(localStorage.getItem('gioData_v3.2')) || {
+        let gioData = JSON.parse(localStorage.getItem('gioData_v3.3')) || {
             score: 0,
             coins: 0,
             completed: [],
             lastDate: new Date().toLocaleDateString(),
-            extraTaskName: "Misión Extra del Día...", // Tarea libre
             tasks: {
                 morning: [
-                    { id: "m1", name: "5:00AM: Agua + Estiramiento", pts: 10 },
-                    { id: "m2", name: "7:30AM: Salida Z150 (Prevenido)", pts: 10 }
+                    { id: "m1", name: "Hacer la cama", pts: 10 },
+                    { id: "m2", name: "Rutina de Higiene Care", pts: 10 },
+                    { id: "m3", name: "Bloque Profundo (Deep Work)", pts: 20 },
+                    { id: "m4", name: "BIBLIO-STRATEGY (Lectura/Sistema)", pts: 15 },
+                    { id: "m-extra", name: "Extra: Edición/Pendiente...", pts: 15, isExtra: true }
                 ],
                 afternoon: [
-                    { id: "a1", name: "BAMX / Gestión Aliados", pts: 20 },
-                    { id: "a2", name: "Hidratación (1L)", pts: 10 }
+                    { id: "a1", name: "3 Impactos Reales (PCHO/TXCH/Aliados)", pts: 25 },
+                    { id: "a2", name: "Ventilar Espacio (Liberar Cortisol)", pts: 10 },
+                    { id: "a3", name: "Hidratación (+1 Litro)", pts: 10 },
+                    { id: "a-extra", name: "Extra: Edición/Pendiente...", pts: 15, isExtra: true }
                 ],
                 evening: [
-                    { id: "e1", name: "Orden 10 min (Home Order)", pts: 15 },
-                    { id: "e2", name: "Desconexión / Mental Clarity", pts: 15 }
+                    { id: "e1", name: "Orden Habitación (25 min)", pts: 15 },
+                    { id: "e2", name: "Cena Saludable", pts: 10 },
+                    { id: "e3", name: "Master Plan: Outfit & Agenda Mañana", pts: 20 },
+                    { id: "e-extra", name: "Extra: Edición/Pendiente...", pts: 15, isExtra: true }
                 ]
-            },
-            dailyPillars: {
-                2: { id: "p2", name: "EDICIÓN: Football Progress", pts: 40 }, // Martes
-                6: { id: "p6", name: "Mantto. Z150 + Casa", pts: 40 },      // Sábado
-                0: { id: "p0", name: "ESTRATEGIA: Plan Semanal", pts: 40 }   // Domingo
             }
         };
 
@@ -127,7 +126,6 @@
         function init() {
             if (gioData.lastDate !== new Date().toLocaleDateString()) {
                 gioData.score = 0; gioData.completed = []; gioData.lastDate = new Date().toLocaleDateString();
-                gioData.extraTaskName = "Misión Extra del Día...";
             }
             renderTasks();
             updateUI();
@@ -150,68 +148,45 @@
             root.innerHTML = "";
             
             const sections = [
-                { title: "🌞 Bloque Mañana", data: gioData.tasks.morning },
-                { title: "🌤 Bloque Tarde", data: gioData.tasks.afternoon },
-                { title: "🌙 Bloque Noche", data: gioData.tasks.evening }
+                { title: "🌞 Mañana: Táctica & Espíritu", data: gioData.tasks.morning },
+                { title: "🌤 Tarde: Impacto & BAMX", data: gioData.tasks.afternoon },
+                { title: "🌙 Noche: Orden & Estrategia", data: gioData.tasks.evening }
             ];
 
             sections.forEach(s => {
                 const group = document.createElement('div');
-                group.innerHTML = `<h3 class="text-[9px] text-muted mb-3 uppercase tracking-widest font-bold">${s.title}</h3>`;
+                group.innerHTML = `<h3 class="text-[9px] text-muted mb-3 uppercase tracking-widest font-bold text-white opacity-50">${s.title}</h3>`;
                 s.data.forEach(t => group.appendChild(createTaskCard(t)));
                 root.appendChild(group);
             });
-
-            // SECCIÓN PILAR + EXTRA
-            const pilarGroup = document.createElement('div');
-            pilarGroup.className = "border-t border-zinc-800 pt-6";
-            pilarGroup.innerHTML = `<h3 class="text-[9px] text-accent mb-3 uppercase tracking-widest font-bold text-white">🎯 Eje del Día & Extra</h3>`;
-            
-            // Pilar automático
-            const pilar = gioData.dailyPillars[WEEKDAY] || { id: "p-std", name: "Foco en Metas 30s", pts: 20 };
-            pilarGroup.appendChild(createTaskCard(pilar));
-
-            // SLOT EXTRA EDITABLE
-            const extraCard = document.createElement('div');
-            const extraDone = gioData.completed.includes('extra-task');
-            extraCard.className = `card task-item p-4 flex justify-between items-center cursor-pointer ${extraDone ? 'done' : ''}`;
-            extraCard.innerHTML = `
-                <div class="w-full mr-4">
-                    <input type="text" value="${gioData.extraTaskName}" 
-                        class="extra-input task-input text-sm italic text-accent" 
-                        onchange="gioData.extraTaskName = this.value; saveData();"
-                        onclick="event.stopPropagation()">
-                </div>
-                <span class="text-[10px] font-bold text-muted">+20</span>
-            `;
-            extraCard.onclick = () => {
-                if(!gioData.completed.includes('extra-task')) {
-                    gioData.completed.push('extra-task');
-                    gioData.score += 20; updateUI(); saveData(); renderTasks();
-                }
-            };
-            pilarGroup.appendChild(extraCard);
-            
-            root.appendChild(pilarGroup);
         }
 
         function createTaskCard(t) {
             const card = document.createElement('div');
             const done = gioData.completed.includes(t.id);
-            card.className = `card task-item p-4 mb-2 flex justify-between items-center cursor-pointer ${done ? 'done' : ''}`;
+            card.className = `card task-item p-4 mb-2 flex justify-between items-center cursor-pointer ${done ? 'done' : ''} ${t.isExtra ? 'border-dashed border-zinc-700' : ''}`;
             
-            if (isEditMode) {
-                card.innerHTML = `<input type="text" value="${t.name}" onblur="updateTaskText('${t.id}', this.value)" class="task-input text-sm">`;
+            if (isEditMode || (t.isExtra && !done)) {
+                card.innerHTML = `
+                    <div class="w-full">
+                        <input type="text" value="${t.name}" 
+                            class="task-input text-sm ${t.isExtra ? 'extra-input text-accent' : ''}" 
+                            onchange="updateTaskText('${t.id}', this.value)"
+                            onclick="event.stopPropagation()">
+                    </div>
+                    <span class="text-[10px] font-bold text-muted ml-2">+${t.pts}</span>
+                `;
             } else {
                 card.innerHTML = `<span class="text-sm font-medium">${t.name}</span><span class="text-[10px] font-bold text-muted">+${t.pts}</span>`;
-                card.onclick = () => {
-                    if(!gioData.completed.includes(t.id)) {
-                        gioData.completed.push(t.id);
-                        gioData.score += t.pts;
-                        updateUI(); saveData(); renderTasks();
-                    }
-                };
             }
+
+            card.onclick = () => {
+                if(!gioData.completed.includes(t.id)) {
+                    gioData.completed.push(t.id);
+                    gioData.score += t.pts;
+                    updateUI(); saveData(); renderTasks();
+                }
+            };
             return card;
         }
 
@@ -220,14 +195,12 @@
                 const t = cat.find(item => item.id === id);
                 if(t) t.name = text;
             });
-            Object.values(gioData.dailyPillars).forEach(p => {
-                if(p.id === id) p.name = text;
-            });
+            saveData();
         }
 
         function toggleEditMode() {
             isEditMode = !isEditMode;
-            document.getElementById('btn-edit').innerText = isEditMode ? "💾 GUARDAR" : "✏️ EDITAR";
+            document.getElementById('btn-edit').innerText = isEditMode ? "💾 GUARDAR" : "✏️ EDITAR ESTRUCTURA";
             renderTasks();
             if(!isEditMode) saveData();
         }
@@ -235,15 +208,15 @@
         function updateUI() {
             document.getElementById('main-score').innerText = gioData.score;
             document.getElementById('coin-count').innerText = gioData.coins;
-            document.getElementById('progress-bar').style.width = (gioData.score/170*100) + "%";
+            document.getElementById('progress-bar').style.width = (gioData.score/200*100) + "%";
         }
 
         function addCoin() { gioData.coins++; updateUI(); saveData(); }
-        function saveData() { localStorage.setItem('gioData_v3.2', JSON.stringify(gioData)); }
+        function saveData() { localStorage.setItem('gioData_v3.3', JSON.stringify(gioData)); }
         function saveBackup() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gioData));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", "progress_backup.json"); dl.click();
+            dl.setAttribute("download", "progress_master_backup.json"); dl.click();
         }
 
         init();
